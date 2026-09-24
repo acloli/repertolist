@@ -10,6 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import work.fmhr.repertory.dto.SongRequest;
 import work.fmhr.repertory.dto.SongResponse;
 import work.fmhr.repertory.dto.SongSummaryResponse;
+import work.fmhr.repertory.exception.SongNotFoundException;
 import work.fmhr.repertory.service.SongService;
 
 import java.time.LocalDateTime;
@@ -94,7 +95,7 @@ class SongControllerTest {
         @Test
         @DisplayName("GET /api/v1/songs/{id} で曲が存在しない場合は404 Not Foundが返る")
         void testDetailNotFound() throws Exception {
-                when(songService.findById(999L)).thenThrow(new IllegalArgumentException("指定された曲が見つかりません (id=999)"));
+                when(songService.findById(999L)).thenThrow(new SongNotFoundException(999L));
 
                 mockMvc.perform(get("/api/v1/songs/999"))
                                 .andExpect(status().isNotFound());
@@ -173,7 +174,7 @@ class SongControllerTest {
         @Test
         @DisplayName("DELETE /api/v1/songs/{id} で存在しないIDの場合は404 Not Found")
         void testDeleteNotFound() throws Exception {
-                doThrow(new IllegalArgumentException("指定された曲が見つかりません (id=999)")).when(songService).delete(999L);
+                doThrow(new SongNotFoundException(999L)).when(songService).delete(999L);
 
                 mockMvc.perform(delete("/api/v1/songs/999"))
                                 .andExpect(status().isNotFound());

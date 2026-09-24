@@ -75,12 +75,12 @@ class SongServiceTest {
     }
 
     @Test
-    @DisplayName("存在しないIDの曲取得時にIllegalArgumentExceptionが発生すること")
+    @DisplayName("存在しないIDの曲取得時にSongNotFoundExceptionが発生すること")
     void testFindByIdNotFound() {
         when(songRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> songService.findById(999L))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(SongNotFoundException.class)
                 .hasMessageContaining("999");
     }
 
@@ -113,13 +113,13 @@ class SongServiceTest {
     }
 
     @Test
-    @DisplayName("存在しないIDの曲更新時にIllegalArgumentExceptionが発生すること")
+    @DisplayName("存在しないIDの曲更新時にSongNotFoundExceptionが発生すること")
     void testUpdateNotFound() {
         SongRequest request = new SongRequest("タイトル", "歌手", "原曲", "ready", "メモ");
         when(songRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> songService.update(999L, request))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(SongNotFoundException.class)
                 .hasMessageContaining("999");
     }
 
@@ -134,12 +134,12 @@ class SongServiceTest {
     }
 
     @Test
-    @DisplayName("存在しないIDの曲削除時にIllegalArgumentExceptionが発生すること")
+    @DisplayName("存在しないIDの曲削除時にSongNotFoundExceptionが発生すること")
     void testDeleteNotFound() {
         when(songRepository.existsById(999L)).thenReturn(false);
 
         assertThatThrownBy(() -> songService.delete(999L))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(SongNotFoundException.class)
                 .hasMessageContaining("999");
 
         verify(songRepository, never()).deleteById(anyLong());

@@ -8,6 +8,7 @@ import work.fmhr.repertory.dto.SongRequest;
 import work.fmhr.repertory.dto.SongResponse;
 import work.fmhr.repertory.dto.SongSummaryResponse;
 import work.fmhr.repertory.entity.Song;
+import work.fmhr.repertory.exception.SongNotFoundException;
 import work.fmhr.repertory.repository.SongRepository;
 
 import java.util.List;
@@ -45,7 +46,7 @@ public class SongService {
     // Entityを1件取得
     public Song getEntityById(Long id) {
         return songRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("指定されたIDの曲が見つかりませんでした。ID:" + id));
+                .orElseThrow(() -> new SongNotFoundException(id));
     }
 
     // 曲の新規登録
@@ -85,7 +86,7 @@ public class SongService {
     public void delete(Long id) {
         log.info("曲を削除します: id={}", id);
         if (!songRepository.existsById(id)) {
-            throw new IllegalArgumentException("指定されたIDの曲が見つかりませんでした。ID:" + id);
+            throw new SongNotFoundException(id);
         }
         songRepository.deleteById(id);
         log.info("曲を削除しました: id={}", id);
