@@ -3,7 +3,7 @@ import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "レパートリー管理",
+  title: "配信レパートリー管理",
   description: "配信者向けレパートリー管理ツール",
 };
 
@@ -16,11 +16,10 @@ export default function RootLayout({
     <html lang="ja">
       <body>
         <header className="header">
-          <h1 className="header-title">レパートリー管理</h1>
+          <h1 className="header-title">配信レパートリー管理</h1>
           <nav className="header-nav">
             <Link href="/" className="header-nav__link">ホーム</Link>
             <Link href="/songs" className="header-nav__link">曲一覧</Link>
-            <Link href="/songs/new" className="header-nav__link">新規登録</Link>
           </nav>
         </header>
 

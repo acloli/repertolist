@@ -49,7 +49,7 @@ export default function SongListTable({ initialSongs }: { initialSongs: Song[] }
 
   return (
     <main className="songs-page" style={{ maxWidth: "750px" }}>
-      <h3 className="songs-page__title">配信レパートリー管理</h3>
+      <h3 className="songs-page__title">曲一覧・管理画面</h3>
 
       <div className="songs-toolbar">
         {/* ボタン列 */}
