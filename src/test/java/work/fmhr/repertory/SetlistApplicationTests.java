@@ -1,10 +1,10 @@
-package work.fmhr.setlist;
+package work.fmhr.repertory;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SetlistApplicationTests {
+class RepertoryApplicationTests {
 
 	@Test
 	void contextLoads() {
