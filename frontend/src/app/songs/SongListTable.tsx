@@ -10,12 +10,25 @@ export default function SongListTable({ initialSongs }: { initialSongs: Song[] }
   const router = useRouter();
 
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const filteredSongs = initialSongs.filter((song) => {
+    // ステータス絞り込み
     if (statusFilter !== "all" && song.status !== statusFilter) {
       return false;
     }
+
+    // キーワード検索
+    if (searchKeyword.trim()) {
+      const keyword = searchKeyword.trim().toLowerCase();
+      const matchTitle = song.title.toLowerCase().includes(keyword);
+      const matchArtist = song.artist?.toLowerCase().includes(keyword) ?? false;
+      if (!matchTitle && !matchArtist) {
+        return false;
+      }
+    }
+
     return true;
   });
 
@@ -46,7 +59,7 @@ export default function SongListTable({ initialSongs }: { initialSongs: Song[] }
           </Link>
         </div>
 
-        {/* 絞り込み行 */}
+        {/* 絞り込み & 検索行 */}
         <div className="songs-toolbar__row">
           <label style={{ fontSize: "0.9rem" }}>
             絞り込み:{" "}
@@ -61,12 +74,24 @@ export default function SongListTable({ initialSongs }: { initialSongs: Song[] }
               <option value="pending">保留</option>
             </select>
           </label>
+
+          <label style={{ fontSize: "0.9rem", flex: 1, display: "flex", alignItems: "center" }}>
+            検索:{" "}
+            <input
+              type="text"
+              className="search-input"
+              style={{ marginLeft: "0.5rem", flex: 1 }}
+              placeholder="曲名・アーティスト名..."
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+            />
+          </label>
         </div>
 
         {/* 登録曲数表示 */}
         <div className="songs-toolbar__count">
           登録曲数: 全 {filteredSongs.length} 件
-          {statusFilter !== "all" ? (
+          {statusFilter !== "all" || searchKeyword.trim() ? (
             <span style={{ fontSize: "0.85rem", color: "#888", fontWeight: "normal", marginLeft: "0.5rem" }}>
               （全体 {initialSongs.length} 件）
             </span>
