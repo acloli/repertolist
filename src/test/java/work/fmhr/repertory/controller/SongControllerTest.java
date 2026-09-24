@@ -7,9 +7,11 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import work.fmhr.repertory.config.CorsConfig;
 import work.fmhr.repertory.dto.SongRequest;
 import work.fmhr.repertory.dto.SongResponse;
 import work.fmhr.repertory.dto.SongSummaryResponse;
+import work.fmhr.repertory.exception.GlobalExceptionHandler;
 import work.fmhr.repertory.exception.SongNotFoundException;
 import work.fmhr.repertory.service.SongService;
 
@@ -23,13 +25,14 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(SongController.class)
+@WebMvcTest({ SongController.class, CorsConfig.class, GlobalExceptionHandler.class })
 class SongControllerTest {
 
         @Autowired
@@ -98,7 +101,9 @@ class SongControllerTest {
                 when(songService.findById(999L)).thenThrow(new SongNotFoundException(999L));
 
                 mockMvc.perform(get("/api/v1/songs/999"))
-                                .andExpect(status().isNotFound());
+                                .andExpect(status().isNotFound())
+                                .andExpect(jsonPath("$.status").value(404))
+                                .andExpect(jsonPath("$.message").value("指定された曲が見つかりません (id=999)"));
         }
 
         @Test
@@ -136,7 +141,11 @@ class SongControllerTest {
                                                     "artist": "Ado"
                                                 }
                                                 """))
-                                .andExpect(status().isBadRequest());
+                                .andExpect(status().isBadRequest())
+                                .andExpect(jsonPath("$.status").value(400))
+                                .andExpect(jsonPath("$.message").value("入力内容に誤りがあります"))
+                                .andExpect(jsonPath("$.details").isArray())
+                                .andExpect(jsonPath("$.details[0]").value("title: 曲タイトルは必須です"));
         }
 
         @Test
@@ -177,6 +186,30 @@ class SongControllerTest {
                 doThrow(new SongNotFoundException(999L)).when(songService).delete(999L);
 
                 mockMvc.perform(delete("/api/v1/songs/999"))
-                                .andExpect(status().isNotFound());
+                                .andExpect(status().isNotFound())
+                                .andExpect(jsonPath("$.status").value(404))
+                                .andExpect(jsonPath("$.message").value("指定された曲が見つかりません (id=999)"));
+        }
+
+        @Test
+        @DisplayName("GET /api/v1/songs で予期しない例外が発生した場合は500 Internal Server Errorが返る")
+        void testUnexpectedError() throws Exception {
+                when(songService.findAll(null)).thenThrow(new RuntimeException("DB接続エラー"));
+
+                mockMvc.perform(get("/api/v1/songs"))
+                                .andExpect(status().isInternalServerError())
+                                .andExpect(jsonPath("$.status").value(500))
+                                .andExpect(jsonPath("$.message").value("サーバー内部でエラーが発生しました"));
+        }
+
+        @Test
+        @DisplayName("OPTIONS /api/v1/songs でCORSプリフライトが成功し許可ヘッダーが返る")
+        void testCorsPreflight() throws Exception {
+                mockMvc.perform(options("/api/v1/songs")
+                                .header("Origin", "http://localhost:3000")
+                                .header("Access-Control-Request-Method", "POST"))
+                                .andExpect(status().isOk())
+                                .andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:3000"))
+                                .andExpect(header().string("Access-Control-Allow-Credentials", "true"));
         }
 }
