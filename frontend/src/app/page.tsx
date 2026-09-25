@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { fetchSongSummary } from "@/lib/api";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   let summary = {
     totalCount: 0,
