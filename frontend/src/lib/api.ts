@@ -24,14 +24,9 @@ export async function fetchSongs(status?: string): Promise<Song[]> {
     url.searchParams.set('status', status);
   }
 
-  let res: Response;
-  try {
-    res = await fetch(url.toString(), {
-      cache: 'no-store',
-    });
-  } catch {
-    throw new Error('サーバーに接続できません。起動状態を確認してください。');
-  }
+  const res = await fetch(url.toString(), {
+    cache: 'no-store',
+  });
 
   if (!res.ok) {
     throw new Error(await extractErrorMessage(res, '曲一覧の取得に失敗しました'));
@@ -43,14 +38,9 @@ export async function fetchSongs(status?: string): Promise<Song[]> {
 // 曲の1件取得
 // GET /api/v1/songs/{id}
 export async function fetchSong(id: number): Promise<Song> {
-  let res: Response;
-  try {
-    res = await fetch(`${BASE_URL}/api/v1/songs/${id}`, {
-      cache: 'no-store',
-    });
-  } catch {
-    throw new Error('サーバーに接続できません。起動状態を確認してください。');
-  }
+  const res = await fetch(`${BASE_URL}/api/v1/songs/${id}`, {
+    cache: 'no-store',
+  });
 
   if (res.status === 404) {
     throw new Error('指定された曲が見つかりません');
@@ -129,14 +119,9 @@ export async function deleteSong(id: number): Promise<void> {
 // ステータス別集計取得
 // GET /api/v1/songs/summary
 export async function fetchSongSummary(): Promise<SongSummaryResponse> {
-  let res: Response;
-  try {
-    res = await fetch(`${BASE_URL}/api/v1/songs/summary`, {
-      cache: 'no-store',
-    });
-  } catch {
-    throw new Error('サーバーに接続できません。起動状態を確認してください。');
-  }
+  const res = await fetch(`${BASE_URL}/api/v1/songs/summary`, {
+    cache: 'no-store',
+  });
 
   if (!res.ok) {
     throw new Error(await extractErrorMessage(res, '集計情報の取得に失敗しました'));
