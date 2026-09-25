@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>work.fmhr</groupId>
-	<artifactId>setlist</artifactId>
+	<artifactId>repertolist</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name/>
 	<description/>
